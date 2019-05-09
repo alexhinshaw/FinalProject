@@ -1,0 +1,323 @@
+\documentclass[12pt,english]{article}
+\usepackage{mathptmx}
+
+\usepackage{color}
+\usepackage[dvipsnames]{xcolor}
+\definecolor{darkblue}{RGB}{0.,0.,139.}
+
+\usepackage[top=1in, bottom=1in, left=1in, right=1in]{geometry}
+
+\usepackage{amsmath}
+\usepackage{amstext}
+\usepackage{amssymb}
+\usepackage{setspace}
+\usepackage{lipsum}
+
+\usepackage[authoryear]{natbib}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage[flushleft]{threeparttable}
+\usepackage{graphicx}
+\usepackage[english]{babel}
+\usepackage{pdflscape}
+\usepackage[unicode=true,pdfusetitle,
+ bookmarks=true,bookmarksnumbered=false,bookmarksopen=false,
+ breaklinks=true,pdfborder={0 0 0},backref=false,
+ colorlinks,citecolor=black,filecolor=black,
+ linkcolor=black,urlcolor=black]
+ {hyperref}
+\usepackage[all]{hypcap} % Links point to top of image, builds on hyperref
+\usepackage{breakurl}    % Allows urls to wrap, including hyperref
+\usepackage{indentfirst}
+\linespread{2}
+
+\begin{document}
+
+\begin{singlespace}
+\title{A Model for Determining NFL Quarterback Contract Value Using 2018 Season Statistics\thanks{Special thanks to Dr. Tyler Ransom and Dr. Le Wang, Department of Economics, University of Oklahoma}}
+\end{singlespace}
+
+\author{Alex Hinshaw\thanks{Department of Economics, University of Oklahoma.\
+E-mail~address:~\href{mailto:ahinshaw@ou.edu}{ahinshaw@ou.edu}}}
+
+% \date{\today}
+\date{May 9, 2019}
+
+\maketitle
+
+\begin{abstract}
+\begin{singlespace}
+This project attempts to create a model that can evaluate if an National Football League (NFL) quarterback outplayed or underplayed the valued of his contract. The same model may also have predicitive uses. Knowledge of how a player performed relative to his salary may also be a useful when NFL teams are assessing how much to pay a player after their current contract expires.  Due to the nuanced structure of the NFL's collective bargaining agreement, the quarterbacks will be evaluated in three difference groups: all selected quarterbacks, selected quarterbacks that are currently on their rookie contract (rookie group), and selected quarterbacks that are no longer on their rookie contract (veteran group). Season passing statistics and salary data is collected for the top 40 quarterbacks with the most passing attempts during the 2018 season. The data is obtained from online sources. The data is cleaned and analyzed using the statistical software program R. The model is found to be useful in predicting the salaries of those in the veteran group, useful to some extent with the all selected quarterbacks group, and is ineffective in predicting the salaries of those in the rookie group This model could have implication for professional football organization and the field of sports economics. 
+\end{singlespace}
+
+\end{abstract}
+\vfill{}
+
+
+\pagebreak{}
+
+
+\section{Introduction}\label{sec:intro}
+Professional American football has fallen behind in the realm of sports metrics relative to other
+popular American sports. Major League Baseball (MLB) was one of the first major sporting leagues in the world to begin to keep extensive statistical records on its teams and players. Sabermetrics, the empirical analysis of baseball, as a term was coined by revolutionary sports statistician Bill James in 1977 according to Micheal \citet{moneyball}. In contrast, the NFL launched NextGen Stats in just 2014. NextGen Stats records nearly every thing that happens on the field. From more traditional statistics like touchdowns and yards gained to more advanced metrics such as how fast a player is jumping or how fast a quarterback released a pass. While baseball has also installed similar technology, baseball has been focused on the seemingly less relevant statistics for a much longer time. A few MLB executives were able to use less conspicuous stats to build a low-cost roster that was built to win. Michael Lewis' 2003 book, Moneyball: the Art of Winning in an Unfair Game, and the subsequent movie of the same time are the inspiration for this research. 
+
+Lewis' book chronicles how Billy Beane, general manager of the MLB's Oakland A's, engineers a high performing team using relatively low cost free agents. There is no salary cap in the MLB, so free agents often sign with teams that offer the most lucrative contracts. Historically, free agents with the most home runs, runs scored, stolen bases, and runs batted in are the most sought after and require a king's lot to afford their services. The A's general manager instead used Sabermetrics analysis to determine that slugging percentage and on-base percentage were statistics more indicative of offensive success than that of more traditional indicators. According to \citet{moneyball}, the 2002 Oakland A's spent roughly a third on salaries as did the league's highest spender, the New York Yankees. Both team won 103 games and both lost in the American League Divisional Series. The difference: the A's spent approximately \$81\ million less than the Yankees. My research seeks to see if any such underlying performance indicators exist in football or if traditional indicators are most accurate. Once the best indicators are established, I will create a model that will indicate if an NFL quarterback outperformed, underperformed, or adequately performed given the 2018 season statistics and contract values. 
+
+\section{Literature Review}\label{sec:litreview}
+There is very little literature on the topic of predicting or evaluating NFL contracts of any kind. Most of the literature that attempts to assess a player's monetary value is in sports betting. \citet{KainBetting} tested whether sports betting markets can be used as predictive markets. The authors propose a new test of the predictive power of the sports betting market, which incorporates a seldom-used piece of complementary betting information: the over/under—the predicted sum of scores for a game. Since the over/under has the same market properties as the betting line, it should be similarly predictive about the actual outcome, while if bettors have different beliefs about this game feature it need not be predictive. Using the universe of betting lines and over/unders on NFL, National Basketball Association (NBA), National Collegiate Athletic Association (NCAA) college football, and NCAA college basketball games from 2004 to 2010, the authors test the predictive power of the sports betting market in a seemingly unrelated regression (SUR) structure that allows us to characterize both features of the betting market simultaneously. The joint test reveals that while the betting line is an accurate predictor of the margin of victory, the over/under is a poor predictor of the sum of scores. \citet{KainBetting} rejected their hypothesis that the sports betting market overall functions well as a prediction market. 
+
+\citet{GrayBetting} use a probit model to test efficiency in the NFL betting market. This method allows the authors to circumvent potential econometric problems, and allows the implementation of more sophisticated betting strategies where bets are placed only when there is a relatively high probability of success. In-sample tests indicate that probit-based betting strategies generate statistically significant profits. \citet{GrayBetting} find that where the profitability of a number of these betting strategies is confirmed by out-of-sample testing, there is some inconsistency among the remaining out-of-sample predictions. The results also suggest that widely documented inefficiencies in this market tend to dissipate over time.
+
+While no literature exists on predicting a quasi-exact dollar value of an NFL players season, there has been some research in the allocation of funds under the salary cap. A salary cap is a maximum amount teams in a sports league can spend on their player payroll. This mechanism is in place to promote fairness in the free agency market. That is to say the salary cap prevents the rich teams from being able to out bid the poorer teams for highly sought after free agents. \citet{JensenSalaryCap} attempt to determine the best way to build a team under the current salary cap rules. The authors uses regression strategies to identify which positions are worthy of greater investment, under the assumption that players are paid in an efficient market. Using a combination of univariate regression models, we identify that it is worth investing in elite players at the quarterback, guard, defensive line, and linebacker positions. In addition, through a separate set of regression models we also consider the possibility that markets are not actually efficient. We determine that the optimal way to take advantage of inefficiency is through the draft, in order to find players who can provide significant win contributions early in their careers while they are being paid on relatively low rookie contracts. 
+
+\citet{CBA} provides a brief summary of the changes to player compensation as a result of the NFL's 2011 collective bargaining agreement. He also looks at specifically how rookie wages are impacted based on the round of the draft in which they were selected.The 2011 CBA made two major changes to the rules governing drafted player compensation. First, a rookie wage scale, based on selection number and round, was introduced. Second, there was a limit placed on compensation growth of 25\% of year-one salary. We find the rookie wage scale actually increased the compensation of players selected in the first two rounds of the draft. However, the limit on compensation growth decreased compensation in later years. The overall effect is a significant decrease in the compensation of first-round selections, considering both year-one and year-two salaries.
+
+Anecdotally, one of the intellectual origins for my model is Dr. Le Wang. Dr. Le Wang is a professor at the University of Oklahoma, Department of Economics. I have taken numerous classes with Dr. Wang, including taking his graduate Managerial Economics class this term. During one of his lectures, he showed us how to predict the salary of NCAA head football coaches. He formerly taught at the University of Alabama and he wanted to see if his old employer was overpaying their head football coach, Nick Saban. Using a model he wrote in RStudio, he was able to estimate the value of Nick Saban's constract within 10\%. The code he used and his lectures have been particularly helpful to me as I have worked on this project.
+
+\section{Data}\label{sec:data}
+The data used in this experiment are individual passing statistics from the 2018 NFL season. The top 40 quarterbacks in terms of pass attempts were selected. 40 quarterbacks were chosen because there are 32 NFL teams and many teams use multiple quarterbacks due to injury or poor play of the opening day starter. Passing attempts was used to determine the quarterbacks because aside from age, passing attempts impact every other variable.  The passing data contains 27 different statistics. Summary statistics can be found on Table 1. The statistics are as follows:
+\begin{itemize}
+    \item Age: How old the play was at the beginning of the 2018 season
+    \item G: Games played
+    \item GS: Games Started
+    \item Cmp: Completed pass
+    \item Att: Attempted pass
+    \item Cmp.: Completion Percentage
+    \item Yds: Yards gained by passing
+    \item TD: Touchdowns scored by passing
+    \item TD.: Touchdown percentage
+    \item Int: Interceptions thrown
+    \item Int.: Interception Percentage
+    \item Lng: Longest pass thrown
+    \item Y.A: Yards per attempt
+    \item AY.A: Adjusted yards per attempt. (Passing Yards + 20 * Passing TD - 45 * Interceptions) / (Passes Attempted)
+    \item Y.C: Yards per completion
+    \item Y.G: Yards per game
+    \item Rate: Traditional quarterback rating. Scale from 0-158.3
+    \item QBR: ESPN's quarterback rating. Scale from 0-100
+    \item Sk: Number of times sacked
+    \item Yds.1: Yards lost due to sacks
+    \item NY.A: Net yards per pass attempt. (Passing Yards - Sack Yards) / (Passes Attempted + Times Sacked)
+    \item ANY.A: Adjusted net yards per pass attempt.(Passing Yards - Sack Yards + (20 * Passing TD) - (45 * Interceptions)) / (Passes Attempted + Times Sacked)
+    \item Sk.: Percent of dropbacks in which the quarterback was sacked
+    \item X4QC: 4th quarter comeback. Must be an offensive scoring drive in the 4th quarter, with the team trailing by one score, though not necessarily a drive to take the lead. Only games ending in a win or tie are included.
+    \item GWD: Game winning drive. Must be an offensive scoring drive in the 4th quarter or overtime that puts the winning team ahead for the last time.
+    \item SALARY: The amount a player earned during the 2018 season.
+\end{itemize}
+
+The data was collected from pro-football-reference.com and sportrac.com. The statistical data originated originated from the former and the salary data originated from the latter. This data was chosen because salary data was a necessity for this experiment and the statistical data provided by Pro Football Reference (PFR) contained both tradition bellwether statistics as well as some less traditional statistics. The Pro Football Reference data was available for .CSV download. Unfortunately, the SporTrac data was not. After I downloaded the PFR .CSV file and opened it into Microsoft Office Excel, I manually entered the salary data for each player. After all the necessary data was entered into the .CSV file, I read the .CSV file into RStudio using the "read.csv()" function. 
+
+
+\section{Empirical Methods}\label{sec:methods}
+In order to create the model, the log of salary was regressed against all 27 variables. The log regression values can be observed in Table 2. With each iteration, the least significant variable was removed. This was done several times until the remain values had at least a p-value lower than 0.1. The selected values log regression values can be observed in Table 3. After the relatively insignificant variables were eliminated the model was constructed as follows:
+\begin{equation}
+\label{eq:1}
+\hat{SALARY}=\beta_0 + \beta_1Age + \beta_2G + \beta_3Yds + \beta_4Y.A + \beta_5Y.G + \beta_6X4QC + \beta_7GWD + \epsilon
+\end{equation}
+
+After \hat{SALARY} is obtained, the actual salary a player earned is subtracted from \hat{SALARY}. The difference is the dollar amount in which the player was overpaid or underpaid. Next,\hat{SALARY} can be divided by the players actual salary and then that value has 1 subtracted from it to provide the percentage in which a player is overpaid or underpaid. The percentages are then averaged across 3 groups: All selected quarterbacks, quarterbacks not on their rookie contract (veterans), and quarterbacks on their rookie quarterback (rookies). The average percentages represent the average error that occurs in the model for that specific group. 
+
+\section{Research Findings}\label{sec:results}
+The research findings were mixed. The model worked with varying accuracy across the 3. The percent errors are as follows:
+
+\begin{itemize}
+    \item All selected quarterbacks: 18.259\%
+    \item Veteran contracts: 7.01\%
+    \item Rookie contracts: 37.194\%
+\end{itemize}
+
+\section{Conclusion}\label{sec:conclusion}
+As stated in the finding section, the model's results were mixed. Overall, the model performed well with veterans, somewhat acceptable with the group of all quarterbacks, and failed in predicting rookie contracts. For the all selected quarterbacks group, the percent error was 18.259\%. This value is like caused by the accurate veterans predictions being offset by the inaccurate rookie predictions. This problem was remedied in part by observing the veterans and rookies separately. The veterans model had a percent error of 7.01\%. I believe this to be an accurate model, but it is important to note that there is a lot of variance in the individual percent errors and the average may not speak to the true predictive power of this model. The rookie model failed. The rookie model experienced 37.194\% error. This large error likely has two major attributes. The model relies heavily on the Age variable. Since most rookies are relatively young players, there contract value may be depressed by the Age variable. Outside of the model, the NFL's CBA sets strict salary cap limits on rookie contracts. Regardless of ability, top rookies cannot be paid at the same level of veteran players. This is likely to have played an important roll in depressing rookie contract salaries.
+While the veteran model can be tweaked to perhaps lower the variance in the percentage errors, the rookie model requires the most improvement. Determining variables that are most in tune with rookie contract value may help improve the accuracy of the model. To conclude, I would argue that the veterans model's accuracy suggests that less traditional statistics can be used to assess the value of a quarterback's play. Conventional wisdom relies heavily on touchdowns, interceptions, and total yards. The less traditional passing statistics used in this model produced reasonably accurate results for the veterans group. With a few alteration, this may also be true for the rookies group or even perhaps the all selected quarterbacks group.
+\vfill
+\pagebreak{}
+\begin{spacing}{1.0}
+\bibliographystyle{jpe}
+\bibliography{References.bib}
+\addcontentsline{toc}{section}{References}
+
+\section{Tables and Figure}
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{0pt}}lD{.}{.}{0} D{.}{.}{0} D{.}{.}{0} D{.}{.}{0} D{.}{.}{0} D{.}{.}{0} D{.}{.}{-3} } 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+Statistic & \multicolumn{1}{c}{N} & \multicolumn{1}{c}{Mean} & \multicolumn{1}{c}{St. Dev.} & \multicolumn{1}{c}{Min} & \multicolumn{1}{c}{Pctl(25)} & \multicolumn{1}{c}{Pctl(75)} & \multicolumn{1}{c}{Max} \\ 
+\hline \\[-1.8ex] 
+Age & 40 & 28.725 & 5.620 & 21.000 & 24.000 & 33.000 & 41.000 \\ 
+G & 40 & 12.750 & 3.794 & 4.000 & 10.750 & 16.000 & 16.000 \\ 
+GS & 40 & 12.100 & 4.266 & 3.000 & 9.000 & 16.000 & 16.000 \\ 
+Cmp & 40 & 270.750 & 111.183 & 60.000 & 176.000 & 365.500 & 452.000 \\ 
+Att & 40 & 414.675 & 159.173 & 110.000 & 308.500 & 556.500 & 675.000 \\ 
+Cmp. & 40 & 64.550 & 4.704 & 52.800 & 62.200 & 67.750 & 74.400 \\ 
+Yds & 40 & 3,085.200 & 1,293.726 & 539.000 & 2,252.750 & 4,198.250 & 5,129.000 \\ 
+TD & 40 & 20.075 & 11.109 & 1.000 & 11.000 & 27.500 & 50.000 \\ 
+TD. & 40 & 4.585 & 1.609 & 0.900 & 3.400 & 5.625 & 8.600 \\ 
+Int & 40 & 9.300 & 4.046 & 2.000 & 6.750 & 12.000 & 16.000 \\ 
+Int. & 40 & 2.373 & 0.969 & 0.300 & 1.700 & 2.925 & 4.900 \\ 
+Lng & 40 & 69.725 & 13.413 & 35.000 & 64.000 & 75.000 & 97.000 \\ 
+Y.A & 40 & 7.303 & 0.915 & 4.900 & 6.875 & 7.750 & 9.600 \\ 
+AY.A & 40 & 7.157 & 1.245 & 3.400 & 6.575 & 7.825 & 9.600 \\ 
+Y.C & 40 & 11.318 & 1.154 & 8.300 & 10.600 & 12.100 & 14.400 \\ 
+Y.G & 40 & 236.360 & 57.469 & 75.100 & 209.000 & 274.825 & 320.600 \\ 
+Rate & 40 & 91.745 & 12.497 & 55.800 & 84.425 & 98.950 & 115.700 \\ 
+QBR & 40 & 56.265 & 14.437 & 26.600 & 48.500 & 66.250 & 82.000 \\ 
+Sk & 40 & 29.625 & 13.418 & 7.000 & 18.000 & 40.000 & 62.000 \\ 
+Yds.1 & 40 & 197.500 & 91.471 & 35.000 & 133.000 & 256.750 & 384.000 \\ 
+NY.A & 40 & 6.336 & 1.010 & 3.660 & 5.895 & 6.963 & 8.810 \\ 
+ANY.A & 40 & 6.198 & 1.302 & 2.940 & 5.412 & 6.953 & 8.890 \\ 
+Sk. & 40 & 7.003 & 2.572 & 2.700 & 5.400 & 8.450 & 14.400 \\ 
+X4QC & 40 & 1.650 & 1.511 & 0.000 & 0.000 & 3.000 & 6.000 \\ 
+GWD & 40 & 2.125 & 1.682 & 0.000 & 1.000 & 3.000 & 7.000 \\ 
+SALARY & 40 & 13,079,924 & 10,030,329 & 525,000 & 4,326,191 & 21,862,500 & 33,500,000 \\ 
+\hline \\[-1.8ex] 
+\end{tabular} 
+\end{table}
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & log(SALARY) \\ 
+\hline \\[-1.8ex] 
+ Age & 0.150$^{**}$ \\ 
+  & (0.056) \\ 
+  & \\ 
+ G & 0.730$^{*}$ \\ 
+  & (0.363) \\ 
+  & \\ 
+ GS & 0.079 \\ 
+  & (0.232) \\ 
+  & \\ 
+ Cmp. & $-$0.751 \\ 
+  & (1.592) \\ 
+  & \\ 
+ Yds & $-$0.003 \\ 
+  & (0.002) \\ 
+  & \\ 
+ TD & 0.175 \\ 
+  & (0.188) \\ 
+  & \\ 
+ TD. & $-$3.834 \\ 
+  & (5.016) \\ 
+  & \\ 
+ Int & $-$0.043 \\ 
+  & (0.176) \\ 
+  & \\ 
+ Int. & 3.671 \\ 
+  & (5.571) \\ 
+  & \\ 
+ Lng & $-$0.027 \\ 
+  & (0.020) \\ 
+  & \\ 
+ Y.A & $-$4.677 \\ 
+  & (5.908) \\ 
+  & \\ 
+ AY.A & $-$2.718 \\ 
+  & (6.182) \\ 
+  & \\ 
+ Y.C & 2.572 \\ 
+  & (3.250) \\ 
+  & \\ 
+ Y.G & 0.043$^{*}$ \\ 
+  & (0.022) \\ 
+  & \\ 
+ Rate & 1.399 \\ 
+  & (1.868) \\ 
+  & \\ 
+ QBR & $-$0.033 \\ 
+  & (0.052) \\ 
+  & \\ 
+ Sk & 0.114 \\ 
+  & (0.123) \\ 
+  & \\ 
+ Yds.1 & $-$0.018 \\ 
+  & (0.017) \\ 
+  & \\ 
+ NY.A & $-$0.121 \\ 
+  & (13.085) \\ 
+  & \\ 
+ ANY.A & $-$3.172 \\ 
+  & (12.606) \\ 
+  & \\ 
+ Sk. & $-$0.407 \\ 
+  & (0.689) \\ 
+  & \\ 
+ X4QC & 0.404 \\ 
+  & (0.349) \\ 
+  & \\ 
+ GWD & $-$0.338 \\ 
+  & (0.337) \\ 
+  & \\ 
+ Constant & $-$20.625 \\ 
+  & (35.611) \\ 
+  & \\ 
+\hline \\[-1.8ex] 
+Observations & 40 \\ 
+R$^{2}$ & 0.811 \\ 
+Adjusted R$^{2}$ & 0.538 \\ 
+Residual Std. Error & 0.841 (df = 16) \\ 
+F Statistic & 2.977$^{**}$ (df = 23; 16) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table} 
+
+\begin{table}[!htbp] \centering 
+  \caption{} 
+  \label{} 
+\begin{tabular}{@{\extracolsep{5pt}}lc} 
+\\[-1.8ex]\hline 
+\hline \\[-1.8ex] 
+ & \multicolumn{1}{c}{\textit{Dependent variable:}} \\ 
+\cline{2-2} 
+\\[-1.8ex] & log(SALARY) \\ 
+\hline \\[-1.8ex] 
+ Age & 0.118$^{***}$ \\ 
+  & (0.024) \\ 
+  & \\ 
+ G & 0.534$^{***}$ \\ 
+  & (0.145) \\ 
+  & \\ 
+ Yds & $-$0.002$^{**}$ \\ 
+  & (0.001) \\ 
+  & \\ 
+ Y.A & $-$0.702$^{***}$ \\ 
+  & (0.207) \\ 
+  & \\ 
+ Y.G & 0.026$^{***}$ \\ 
+  & (0.008) \\ 
+  & \\ 
+ X4QC & 0.464$^{*}$ \\ 
+  & (0.233) \\ 
+  & \\ 
+ GWD & $-$0.407$^{*}$ \\ 
+  & (0.212) \\ 
+  & \\ 
+ Constant & 9.505$^{***}$ \\ 
+  & (1.813) \\ 
+  & \\ 
+\hline \\[-1.8ex] 
+Observations & 40 \\ 
+R$^{2}$ & 0.694 \\ 
+Adjusted R$^{2}$ & 0.627 \\ 
+Residual Std. Error & 0.756 (df = 32) \\ 
+F Statistic & 10.382$^{***}$ (df = 7; 32) \\ 
+\hline 
+\hline \\[-1.8ex] 
+\textit{Note:}  & \multicolumn{1}{r}{$^{*}$p$<$0.1; $^{**}$p$<$0.05; $^{***}$p$<$0.01} \\ 
+\end{tabular} 
+\end{table}
+
+ 
+
+\end{spacing}
+
+
+\end{document}
