@@ -5,7 +5,7 @@
 ############ Source Code/README
 
 
-### First, import the 3 data required to run the code. The .CSV files are located at www.WHATever the URL is for the repository
+### First, import the 3 data required to run the code. The .CSV files are located at https://github.com/alexhinshaw/FinalProject/ is for the repository
 
 ALL.QB <- read.csv("ALLqb2018withsalary.csv")
 ROOKIE.QB <- read.csv("ROOKIEqb2018withsalary.csv")
