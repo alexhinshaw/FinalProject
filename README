@@ -1,0 +1,65 @@
+############
+# Final Prject for Data Science for Economsits, Spring 2019: Evalutating QB Contract Value
+############
+
+############ Source Code/README
+
+
+### First, import the 3 data required to run the code. The .CSV files are located at www.WHATever the URL is for the repository
+
+ALL.QB <- read.csv("ALLqb2018withsalary.csv")
+ROOKIE.QB <- read.csv("ROOKIEqb2018withsalary.csv")
+VET.QB <- read.csv("VETqb2018withsalary.csv")
+
+### Library stargazer ttach the datasets you wish to work with at the time. Do not forget to detach when moving between datasets. Let's begin with the ALL.QB
+
+library(stargazer)
+attach(ALL.QB)
+
+### Use the model below to determine the p-values for each variable in the . After each interation removed the least significant variable. Repeat this
+### until all remaining variables are at least p < 0.10 significance. One "*" or more will appear by each variable when this has been achieved.
+
+# Below is the model with all variables included
+ALL.MODEL<- lm(log(SALARY) ~ Age + G + GS + Cmp. + Yds + TD + TD. + Int + Int. + Lng + Y.A + AY.A + Y.C + Y.G + Rate + QBR + Sk 
+                              + Yds.1 + NY.A + ANY.A + Sk. + X4QC + GWD, data=ALL.QB)
+summary(ALL.MODEL)
+# This is the model after all remaining vaiables are significant
+ALL.MODEL <- lm(log(SALARY) ~ Age + G + Yds + Y.A + Y.G
+               + X4QC + GWD, data=ALL.QB)
+
+### I'm not really sure why I have to do log other than for the coefficients. My project is intented to judge the difference in expected salary
+### and actually salary so that is how I am going to proceed. 
+summary(ALL.MODEL)
+
+### Now let's see how the model predicts a quarterback's worth both in terms of log and in absolute terms. Big Ben Roethlisberger had the most
+### passing attempts for the 2018 season so he provides us with the largest sample size
+
+fit.ALL<-ALL.MODEL
+# Log
+predict(fitBEN, newdata = data.frame(Age=36,G=16,Yds=5129,Y.A=7.6,Y.G=320.6,X4QC=2,GWD=3))
+
+###
+# Absolute
+ALL.MODEL <- lm((SALARY) ~ Age + G + Yds + Y.A + Y.G
+                + X4QC + GWD, data=ALL.QB)
+fit.ALL<-ALL.MODEL
+predict(fit.ALL, newdata = data.frame(Age=36,G=16,Yds=5129,Y.A=7.6,Y.G=320.6,X4QC=2,GWD=3))
+
+### Now substract Big Ben's expected salary from his observed salary.
+
+# Absolute
+head(ALL.QB)
+24442226-21850000
+### Looks like Big Ben was underpaid $2,592,226 last year according to this model! 
+
+# Percentage difference
+(24442226/21850000)-1
+
+### The model was only off 11.86%, but given the nature of predictions, this is not too far off.
+
+### This process can be used for any quaterback in their respective model, just make sure you are using the correct model as well as the correct dataset
+### i.e. use the Rookie model with the rookie dataset.
+
+####################
+# END OF README
+####################
